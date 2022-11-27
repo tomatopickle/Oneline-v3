@@ -13,7 +13,7 @@ import 'package:flutterfire_ui/auth.dart';
 import 'component/ChatsList.dart';
 
 FirebaseFirestore db = FirebaseFirestore.instance;
-
+Map<String, dynamic> userDbData = {};
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -94,6 +94,7 @@ class _HomePageState extends State<HomePage> {
           : userData?.email?.replaceAll('@', 'at'),
       'photoURL': userData?.photoURL,
       'phoneNumber': userData?.phoneNumber,
+      'uid': userData?.uid,
       'metaData': {
         'creationTime': userData?.metadata.creationTime,
         'lastSignInTime': userData?.metadata.lastSignInTime,
@@ -119,7 +120,29 @@ class _HomePageState extends State<HomePage> {
               flex: 2500,
               child: Container(
                   color: Colors.black45,
-                  child: ChatLists(context, [], widget.user))),
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: db
+                        .collection('users')
+                        .doc(widget.user?.uid)
+                        .collection('chats')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return ChatLists(
+                            user: widget.user,
+                            userData: userDbData,
+                            data: snapshot.data?.docs ?? []);
+                      }
+
+                      if (snapshot.hasError) {
+                        return Text('Error');
+                      }
+
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    },
+                  ))),
           Expanded(
               flex: 7500,
               child: Padding(
@@ -158,6 +181,22 @@ class AuthGate extends StatelessWidget {
                 ),
               ]);
             }
+            User? userData = snapshot.data;
+            userDbData = {
+              'email': userData?.email,
+              'displayName': userData?.displayName,
+              'meta_displayName': userData?.displayName != null
+                  ? userData?.displayName?.toLowerCase()
+                  : userData?.email?.replaceAll('@', 'at'),
+              'photoURL': userData?.photoURL,
+              'phoneNumber': userData?.phoneNumber,
+              'uid': userData?.uid,
+              'metaData': {
+                'creationTime': userData?.metadata.creationTime,
+                'lastSignInTime': userData?.metadata.lastSignInTime,
+              }
+            };
+
             return HomePage(user: snapshot.data);
           },
         );

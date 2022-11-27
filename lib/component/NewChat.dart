@@ -6,10 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
 import 'package:fancy_avatar/fancy_avatar.dart';
 import 'package:ezanimation/ezanimation.dart';
+import 'package:uuid/uuid.dart';
 
 FirebaseFirestore db = FirebaseFirestore.instance;
 
 class NewChat extends StatefulWidget {
+  const NewChat({super.key, required this.userData});
+  final Map userData;
   @override
   State<StatefulWidget> createState() {
     return _NewChatState();
@@ -54,7 +57,7 @@ class _NewChatState extends State<NewChat> {
                             Expanded(
                                 child: TabBarView(
                               children: [
-                                NewPersonalChat(),
+                                NewPersonalChat(userData: widget.userData),
                                 const Center(
                                   child: Text('Coming soon'),
                                 )
@@ -71,6 +74,9 @@ class _NewChatState extends State<NewChat> {
 }
 
 class NewPersonalChat extends StatefulWidget {
+  const NewPersonalChat({super.key, required this.userData});
+  final Map userData;
+
   @override
   State<StatefulWidget> createState() {
     return _NewPersonalChatState();
@@ -139,8 +145,8 @@ class _NewPersonalChatState extends State<NewPersonalChat> {
                   itemCount: userSearchResults.length,
                   itemBuilder: (context, index) {
                     Map user = userSearchResults[index];
-                    print(user);
                     return Material(
+                        color: Colors.transparent,
                         child: InkWell(
                             onTap: () {
                               setState(() {
@@ -154,7 +160,6 @@ class _NewPersonalChatState extends State<NewPersonalChat> {
                                   selectedUser = userSearchResults[index];
                                   i++;
                                   fabRevealAnimation.start();
-                                  // Timer(Duration(milliseconds: ), () => print('hi!'));
                                 });
 
                                 userSearchResults[index]['selected'] =
@@ -193,12 +198,43 @@ class _NewPersonalChatState extends State<NewPersonalChat> {
           AnimatedBuilder(
               animation: fabRevealAnimation,
               builder: (context, snapshot) {
-                // if (fabRevealAnimation.value == 1) {
-                // }
                 return Transform.scale(
                     scale: fabRevealAnimation.value,
                     child: FloatingActionButton.extended(
-                      onPressed: () {},
+                      onPressed: () {
+                        var id = Uuid().v1();
+                        int time = DateTime.now().millisecondsSinceEpoch;
+                        Map<String, dynamic> chatData = {
+                          'id': id,
+                          'type': 'dm',
+                          'members': <String>[
+                            selectedUser['uid'],
+                            widget.userData['uid']
+                          ],
+                          'creation_time': time
+                        };
+                        db
+                            .collection("chats")
+                            .doc(id)
+                            .collection('data')
+                            .doc('chatData')
+                            .set(chatData);
+                        db.collection("chats").doc(id).collection('msgs').add({
+                          'type': 'meta',
+                          'text': 'New chat created',
+                          'time': time,
+                          'meta_type': 'server_info'
+                        });
+                        chatData['members'].forEach((uid) {
+                          db
+                              .collection('users')
+                              .doc(uid)
+                              .collection('chats')
+                              .doc(id)
+                              .set(chatData);
+                        });
+                        Navigator.pop(context);
+                      },
                       icon: const Icon(Icons.add),
                       label: const Text('Create Chat'),
                     ));
