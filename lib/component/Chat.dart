@@ -75,7 +75,7 @@ class _ChatState extends State<Chat> {
     fabRevealAnimation.start();
     Map chatData = {
       'name': widget.data['otherUserData']['displayName'] ??
-          widget.data['otherUserData']['meta_displayName']
+          widget.data['otherUserData']['email']
     };
     return Scaffold(
         appBar: AppBar(
