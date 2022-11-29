@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:html';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutterfire_ui/auth.dart';
 import 'component/ChatsList.dart';
+import 'component/Chat.dart';
 
 FirebaseFirestore db = FirebaseFirestore.instance;
 Map<String, dynamic> userDbData = {};
@@ -81,6 +83,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List messages = [];
+  Map chatData = {};
   @override
   void initState() {
     debugPrint(widget.user.toString());
@@ -115,7 +119,6 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Row(
         children: <Widget>[
-          // TODO: Add actual contacts
           Expanded(
               flex: 2500,
               child: Container(
@@ -131,7 +134,13 @@ class _HomePageState extends State<HomePage> {
                         return ChatLists(
                             user: widget.user,
                             userData: userDbData,
-                            data: snapshot.data?.docs ?? []);
+                            data: snapshot.data?.docs ?? [],
+                            openChat: (data) {
+                              print('Chat opened');
+                              setState(() {
+                                chatData = data;
+                              });
+                            });
                       }
 
                       if (snapshot.hasError) {
@@ -143,16 +152,25 @@ class _HomePageState extends State<HomePage> {
                       );
                     },
                   ))),
-          Expanded(
-              flex: 7500,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                child: Text(
-                  textAlign: TextAlign.center,
-                  'Hello, this is the new Oneline, aka Oneline V3',
-                  style: Theme.of(context).textTheme.headline4,
-                ),
-              )),
+          if (chatData.isEmpty)
+            Expanded(
+                flex: 7500,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                  child: Text(
+                    textAlign: TextAlign.center,
+                    'Hello, this is the new Oneline, aka Oneline V3',
+                    style: Theme.of(context).textTheme.headline4,
+                  ),
+                )),
+          if (chatData.isNotEmpty)
+            Expanded(
+                flex: 7500,
+                child: Chat(
+                  data: chatData,
+                  user: userDbData,
+                )),
         ],
       ),
     );

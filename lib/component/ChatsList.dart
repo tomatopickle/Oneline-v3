@@ -68,10 +68,12 @@ class ChatLists extends StatefulWidget {
       {super.key,
       required this.user,
       required this.userData,
-      required this.data});
+      required this.data,
+      required this.openChat});
   final User? user;
   final Map userData;
   final List? data;
+  final Function? openChat;
   @override
   State<ChatLists> createState() => _ChatListsState();
 }
@@ -89,7 +91,7 @@ class _ChatListsState extends State<ChatLists> {
             Padding(
               padding: const EdgeInsets.all(8),
               child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                Image.asset('images/logos/noBg.png',
+                Image.asset('./images/logos/noBg.png',
                     height: 25,
                     opacity: const AlwaysStoppedAnimation<double>(0.5)),
                 const SizedBox(width: 7.5),
@@ -112,58 +114,56 @@ class _ChatListsState extends State<ChatLists> {
                   child: ListView.builder(
                       itemCount: data.length,
                       itemBuilder: (context, index) {
-                        return Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                                onTap: () {},
-                                child: Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 7.5),
-                                  child: FutureBuilder(
-                                    future: getDmUser(widget.user?.uid ?? '',
-                                        data[index]['members']),
-                                    builder: (_, snapshot) {
-                                      if (snapshot.hasData) {
-                                        var data = snapshot.data!.data();
-                                        var chatName = data!['displayName'] ??
-                                            data['email'] ??
-                                            'No Name';
-                                        return ListTile(
-                                            leading: SizedBox(
-                                              height: 50,
-                                              width: 50,
-                                              child: FancyAvatar(
-                                                radius: 130,
-                                                ringWidth: 0,
-                                                ringColor: Colors.transparent,
-                                                userImage: Image.network(
-                                                  data['photoURL'] ??
-                                                      'https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png',
-                                                  fit: BoxFit.cover,
-                                                ),
-                                                avatarBackgroundColor:
-                                                    Colors.transparent,
-                                              ),
-                                            ),
-                                            title: Text(chatName));
-                                      }
-                                      return ListTile(
-                                          leading: const SkeletonAvatar(
-                                              style: SkeletonAvatarStyle(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              130)))),
-                                          title: SkeletonLine(
-                                            style: SkeletonLineStyle(
-                                                height: 16,
-                                                width: 64,
-                                                borderRadius:
-                                                    BorderRadius.circular(8)),
-                                          ));
+                        return Container(
+                          padding: const EdgeInsets.symmetric(vertical: 7.5),
+                          child: FutureBuilder(
+                            future: getDmUser(
+                                widget.user?.uid ?? '', data[index]['members']),
+                            builder: (_, snapshot) {
+                              if (snapshot.hasData) {
+                                var userData = snapshot.data!.data();
+                                var chatName = userData!['displayName'] ??
+                                    userData['email'] ??
+                                    'No Name';
+                                return ListTile(
+                                    onTap: () {
+                                      var chat = data[index].data();
+                                      print(chat);
+                                      chat['otherUserData'] = userData;
+                                      widget.openChat!(chat);
                                     },
-                                  ),
-                                )));
+                                    leading: SizedBox(
+                                      height: 50,
+                                      width: 50,
+                                      child: FancyAvatar(
+                                        radius: 130,
+                                        ringWidth: 0,
+                                        ringColor: Colors.transparent,
+                                        userImage: Image.network(
+                                          userData['photoURL'] ??
+                                              'https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                        avatarBackgroundColor:
+                                            Colors.transparent,
+                                      ),
+                                    ),
+                                    title: Text(chatName));
+                              }
+                              return ListTile(
+                                  leading: const SkeletonAvatar(
+                                      style: SkeletonAvatarStyle(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(130)))),
+                                  title: SkeletonLine(
+                                    style: SkeletonLineStyle(
+                                        height: 16,
+                                        width: 64,
+                                        borderRadius: BorderRadius.circular(8)),
+                                  ));
+                            },
+                          ),
+                        );
                       })),
             UserInfo(context, widget.user),
           ],
