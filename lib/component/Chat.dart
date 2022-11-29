@@ -150,7 +150,7 @@ class _ChatState extends State<Chat> {
                   ]))
               : Column(
                   children: [
-                    for (var i in List.filled(15, ''))
+                    for (var i in List.filled(5, ''))
                       Row(
                         children: [
                           SkeletonAvatar(
@@ -163,7 +163,6 @@ class _ChatState extends State<Chat> {
                           ),
                           SkeletonLine(
                             style: SkeletonLineStyle(
-                                randomLength: true,
                                 height: 25,
                                 width: MediaQuery.of(context).size.width - 450,
                                 borderRadius: BorderRadius.circular(8)),
