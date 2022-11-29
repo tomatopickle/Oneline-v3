@@ -58,8 +58,11 @@ class _ChatState extends State<Chat> {
               (event) {
                 setState(() {
                   messages = event.docs;
-                  messagesScrollController.jumpTo(
-                      messagesScrollController.position.maxScrollExtent + 100);
+                  Future.delayed(Duration(seconds: 1), () {
+                    print("EXCEUCTING");
+                    messagesScrollController.jumpTo(
+                        messagesScrollController.position.maxScrollExtent);
+                  });
                 });
               },
               onError: (error) => print("Listen failed: $error"),
@@ -76,10 +79,26 @@ class _ChatState extends State<Chat> {
     fabRevealAnimation.start();
     Map chatData = {
       'name': widget.data['otherUserData']['displayName'] ??
-          widget.data['otherUserData']['email']
+          widget.data['otherUserData']['email'],
+      'photoURL': widget.data['otherUserData']['photoURL'] ??
+          'https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png',
     };
     return Scaffold(
         appBar: AppBar(
+          leading: SizedBox(
+              width: 50,
+              height: 42.5,
+              child: CircleAvatar(
+                  radius: 130,
+                  backgroundColor: Colors.transparent,
+                  child: ClipOval(
+                      clipBehavior: Clip.hardEdge,
+                      child: Image.network(
+                        chatData['photoURL'],
+                        fit: BoxFit.cover,
+                        height: 42.5,
+                        scale: 0.25,
+                      )))),
           title: Text(chatData['name']),
           backgroundColor: Theme.of(context).backgroundColor,
         ),
@@ -100,6 +119,7 @@ class _ChatState extends State<Chat> {
                                 padding: EdgeInsets.symmetric(
                                     vertical: 5, horizontal: 10),
                                 child: Text(item.data()['text'])))
+                                
                       else
                         Padding(
                             padding: EdgeInsets.symmetric(
@@ -143,7 +163,10 @@ class _ChatState extends State<Chat> {
                                               .labelSmall,
                                         ),
                                       ),
-                                      SelectableText(item.data()['text']),
+                                      SelectableText(
+                                        item.data()['text'],
+                                        style: TextStyle(fontSize: 17.5),
+                                      ),
                                     ]))
                               ],
                             ))
