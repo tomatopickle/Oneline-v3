@@ -3,6 +3,7 @@ import 'package:ezanimation/ezanimation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:oneline/main.dart';
+import 'package:skeletons/skeletons.dart';
 
 FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -83,69 +84,95 @@ class _ChatState extends State<Chat> {
           backgroundColor: Theme.of(context).backgroundColor,
         ),
         body: Padding(
-            padding: EdgeInsets.all(10),
-            child: SingleChildScrollView(
-                controller: messagesScrollController,
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  for (var item in messages)
-                    if (item['type'] == 'meta')
-                      Center(
-                          child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(75),
-                                color: Theme.of(context).canvasColor,
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 10),
-                              child: Text(item.data()['text'])))
-                    else
-                      Padding(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                  width: 42.5,
-                                  height: 42.5,
-                                  child: CircleAvatar(
-                                      radius: 130,
-                                      backgroundColor: Colors.transparent,
-                                      child: ClipOval(
-                                          clipBehavior: Clip.hardEdge,
-                                          child: Image.network(
-                                            members[item.data()['sender']]
-                                                    ['photoURL'] ??
-                                                'https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png',
-                                            fit: BoxFit.cover,
-                                            height: 42.5,
-                                            scale: 0.25,
-                                          )))),
-                              SizedBox(
-                                width: 15,
-                              ),
-                              Expanded(
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                    Opacity(
-                                      opacity: 0.5,
-                                      child: SelectableText(
-                                        members[item.data()['sender']]
-                                                ['displayName'] ??
-                                            members[item.data()['sender']]
-                                                ['email'],
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelSmall,
+          padding: EdgeInsets.all(10),
+          child: messages.isNotEmpty == true
+              ? SingleChildScrollView(
+                  controller: messagesScrollController,
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    for (var item in messages)
+                      if (item['type'] == 'meta')
+                        Center(
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(75),
+                                  color: Theme.of(context).canvasColor,
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 10),
+                                child: Text(item.data()['text'])))
+                      else
+                        Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 5),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                    width: 42.5,
+                                    height: 42.5,
+                                    child: CircleAvatar(
+                                        radius: 130,
+                                        backgroundColor: Colors.transparent,
+                                        child: ClipOval(
+                                            clipBehavior: Clip.hardEdge,
+                                            child: Image.network(
+                                              members[item.data()['sender']]
+                                                      ['photoURL'] ??
+                                                  'https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png',
+                                              fit: BoxFit.cover,
+                                              height: 42.5,
+                                              scale: 0.25,
+                                            )))),
+                                SizedBox(
+                                  width: 15,
+                                ),
+                                Expanded(
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                      Opacity(
+                                        opacity: 0.5,
+                                        child: SelectableText(
+                                          members[item.data()['sender']]
+                                                  ['displayName'] ??
+                                              members[item.data()['sender']]
+                                                  ['email'],
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelSmall,
+                                        ),
                                       ),
-                                    ),
-                                    SelectableText(item.data()['text']),
-                                  ]))
-                            ],
-                          ))
-                ]))),
+                                      SelectableText(item.data()['text']),
+                                    ]))
+                              ],
+                            ))
+                  ]))
+              : Column(
+                  children: [
+                    for (var i in List.filled(15, ''))
+                      Row(
+                        children: [
+                          SkeletonAvatar(
+                              style: SkeletonAvatarStyle(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(130)))),
+                          SizedBox(
+                            width: 15,
+                            height: 75,
+                          ),
+                          SkeletonLine(
+                            style: SkeletonLineStyle(
+                                randomLength: true,
+                                height: 25,
+                                width: MediaQuery.of(context).size.width - 450,
+                                borderRadius: BorderRadius.circular(8)),
+                          ),
+                        ],
+                      )
+                  ],
+                ),
+        ),
         bottomNavigationBar: BottomAppBar(
             child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
