@@ -46,8 +46,7 @@ class _ChatState extends State<Chat> {
             setState(() {
               messages = value.docs;
             });
-            print('MEMBERS');
-            print(members);
+
             db
                 .collection('chats')
                 .doc(widget.data['id'])
@@ -59,7 +58,6 @@ class _ChatState extends State<Chat> {
                 setState(() {
                   messages = event.docs;
                   Future.delayed(Duration(seconds: 1), () {
-                    print("EXCEUCTING");
                     messagesScrollController.jumpTo(
                         messagesScrollController.position.maxScrollExtent);
                   });
@@ -119,7 +117,6 @@ class _ChatState extends State<Chat> {
                                 padding: EdgeInsets.symmetric(
                                     vertical: 5, horizontal: 10),
                                 child: Text(item.data()['text'])))
-                                
                       else
                         Padding(
                             padding: EdgeInsets.symmetric(
@@ -151,17 +148,30 @@ class _ChatState extends State<Chat> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                      Opacity(
-                                        opacity: 0.5,
-                                        child: SelectableText(
-                                          members[item.data()['sender']]
-                                                  ['displayName'] ??
+                                      Row(
+                                        children: [
+                                          Opacity(
+                                            opacity: 0.75,
+                                            child: SelectableText(
                                               members[item.data()['sender']]
-                                                  ['email'],
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelSmall,
-                                        ),
+                                                      ['displayName'] ??
+                                                  members[item.data()['sender']]
+                                                      ['email'],
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .labelMedium,
+                                            ),
+                                          ),
+                                          Opacity(
+                                            opacity: 0.5,
+                                            child: SelectableText(
+                                              getLocalTime(item.data()['time']),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .labelSmall,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                       SelectableText(
                                         item.data()['text'],
@@ -263,4 +273,16 @@ class _ChatState extends State<Chat> {
                         })
                 ]))));
   }
+}
+
+String getLocalTime(int item) {
+  var dateObj = DateTime.fromMillisecondsSinceEpoch(item);
+  var time = (dateObj.hour < 13
+          ? dateObj.hour.toString()
+          : (dateObj.hour - 12).toString()) +
+      ':' +
+      ((dateObj.minute != 0) ? dateObj.minute.toString() : '00') +
+      ' ' +
+      (dateObj.hour < 13 ? 'AM' : 'PM');
+  return time;
 }
