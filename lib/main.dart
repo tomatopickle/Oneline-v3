@@ -11,7 +11,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutterfire_ui/auth.dart';
-import 'package:update_helper/update_helper.dart';
 import 'component/ChatsList.dart';
 import 'component/Chat.dart';
 
@@ -38,14 +37,6 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final updateHelper = UpdateHelper.instance;
-    updateHelper.initial(
-      context: context,
-      updateConfig: UpdateConfig(
-        defaultConfig: UpdatePlatformConfig(latestVersion: '3.0.0'),
-      ),
-      // forceUpdate: true, // Add this line if you want users to be forced to update
-    );
     return MaterialApp(
       title: 'Oneline',
 // This theme was made for FlexColorScheme version 6.1.1. Make sure
