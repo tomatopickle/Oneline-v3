@@ -160,7 +160,7 @@ class _HomePageState extends State<HomePage> {
                       const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                   child: Text(
                     textAlign: TextAlign.center,
-                    'Hello, this is the new Oneline, aka Oneline V3',
+                    'Pick a chat from the left',
                     style: Theme.of(context).textTheme.headline4,
                   ),
                 ))

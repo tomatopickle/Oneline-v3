@@ -87,6 +87,7 @@ class _NewPersonalChatState extends State<NewPersonalChat> {
   final userSearchInputController = TextEditingController();
   List userSearchResults = [];
   bool loading = false;
+  bool chatAlrExists = false;
   Map selectedUser = {};
   EzAnimation fabRevealAnimation =
       EzAnimation(0, 1, const Duration(milliseconds: 150));
@@ -99,38 +100,54 @@ class _NewPersonalChatState extends State<NewPersonalChat> {
             Expanded(
               child: TextField(
                 controller: userSearchInputController,
-                decoration: InputDecoration(hintText: "Search for a user"),
+                onChanged: (value) {
+                  setState(() {
+                    userSearchResults = [];
+                    chatAlrExists = false;
+                  });
+                },
+                decoration: !chatAlrExists
+                    ? InputDecoration(hintText: "Search for a user")
+                    : InputDecoration(
+                        hintText: "Search for a user",
+                        errorStyle: TextStyle(),
+                        errorText: 'Chat already exists'),
               ),
             ),
             const SizedBox(
               width: 10,
             ),
-            FloatingActionButton(
-              onPressed: () {
-                userSearchResults = [];
-                debugPrint(userSearchInputController.text);
-                setState(() {
-                  loading = true;
-                });
-                db
-                    .collection("users")
-                    .where("meta_displayName",
-                        isGreaterThanOrEqualTo:
-                            userSearchInputController.text.toLowerCase())
-                    .where("meta_displayName", isLessThanOrEqualTo: "mi\uF7FF")
-                    .get()
-                    .then(
-                  (res) {
-                    for (var el in res.docs) {
-                      userSearchResults.add(el.data());
-                    }
-                    setState(() {
-                      loading = false;
-                    });
-                  },
-                );
-              },
-              child: const Icon(Icons.search),
+            Padding(
+              padding: EdgeInsets.only(
+                  bottom: chatAlrExists ? 25 : 0), // To fix a positional error
+              child: FloatingActionButton(
+                onPressed: () {
+                  userSearchResults = [];
+                  debugPrint(userSearchInputController.text);
+                  setState(() {
+                    loading = true;
+                  });
+                  db
+                      .collection("users")
+                      .where("meta_displayName",
+                          isGreaterThanOrEqualTo:
+                              userSearchInputController.text.toLowerCase())
+                      .where("meta_displayName",
+                          isLessThanOrEqualTo: "mi\uF7FF")
+                      .get()
+                      .then(
+                    (res) {
+                      for (var el in res.docs) {
+                        userSearchResults.add(el.data());
+                      }
+                      setState(() {
+                        loading = false;
+                      });
+                    },
+                  );
+                },
+                child: const Icon(Icons.search),
+              ),
             )
           ],
         ),
@@ -170,6 +187,7 @@ class _NewPersonalChatState extends State<NewPersonalChat> {
                                     false) {
                                   setState(() {
                                     selectedUser = {};
+                                    chatAlrExists = false;
                                   });
                                 }
                               });
@@ -202,6 +220,27 @@ class _NewPersonalChatState extends State<NewPersonalChat> {
                     scale: fabRevealAnimation.value,
                     child: FloatingActionButton.extended(
                       onPressed: () {
+                        print(widget.userData.toString());
+                        db
+                            .collection('users')
+                            .doc(widget.userData['uid'])
+                            .collection('chats')
+                            .get()
+                            .then((value) {
+                          for (var e in value.docs) {
+                            if (e['type'] != 'dm') {
+                              return;
+                            }
+                            e.data()['members'].forEach((e) {
+                              if (e == selectedUser['uid']) {
+                                setState(() {
+                                  chatAlrExists = true;
+                                });
+                              }
+                            });
+                          }
+                        });
+                        return;
                         var id = Uuid().v1();
                         int time = DateTime.now().millisecondsSinceEpoch;
                         Map<String, dynamic> chatData = {
