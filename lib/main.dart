@@ -13,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutterfire_ui/auth.dart';
 import 'component/ChatsList.dart';
 import 'component/Chat.dart';
+import 'package:pwa_update_listener/pwa_update_listener.dart';
 
 FirebaseFirestore db = FirebaseFirestore.instance;
 Map<String, dynamic> userDbData = {};
@@ -117,7 +118,28 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
+        body: PwaUpdateListener(
+      onReady: () {
+        /// Show a snackbar to get users to reload into a newer version
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Expanded(child: Text('A new update is ready')),
+                TextButton(
+                  onPressed: () {
+                    reloadPwa();
+                  },
+                  child: Text('UPDATE'),
+                ),
+              ],
+            ),
+            duration: Duration(days: 365),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      },
+      child: Row(
         children: <Widget>[
           Expanded(
               flex: 2500,
@@ -173,7 +195,7 @@ class _HomePageState extends State<HomePage> {
                 )),
         ],
       ),
-    );
+    ));
   }
 }
 
