@@ -151,16 +151,9 @@ class _ChatListsState extends State<ChatLists> {
                                     title: Text(chatName));
                               }
                               return ListTile(
-                                  leading: const SkeletonAvatar(
-                                      style: SkeletonAvatarStyle(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(130)))),
-                                  title: SkeletonLine(
-                                    style: SkeletonLineStyle(
-                                        height: 16,
-                                        width: 64,
-                                        borderRadius: BorderRadius.circular(8)),
-                                  ));
+                                leading: CircularProgressIndicator(),
+                                title: LinearProgressIndicator(),
+                              );
                             },
                           ),
                         );
