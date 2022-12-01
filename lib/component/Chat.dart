@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ezanimation/ezanimation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/rendering.dart';
 import 'package:oneline/main.dart';
 import 'package:skeletons/skeletons.dart';
 import 'package:flutter/foundation.dart';
@@ -28,6 +29,8 @@ class _ChatState extends State<Chat> {
   List messages = [];
   Map members = {};
   bool newMessage = false;
+  bool oldMsgsLoading = false;
+  int numberOfMessages = 35;
   @override
   void initState() {
     db
@@ -46,7 +49,7 @@ class _ChatState extends State<Chat> {
               .doc(widget.data['id'])
               .collection('msgs')
               .orderBy('time')
-              .limitToLast(35)
+              .limitToLast(numberOfMessages)
               .snapshots()
               .listen(
             (event) {
@@ -55,6 +58,30 @@ class _ChatState extends State<Chat> {
                 Future.delayed(Duration(milliseconds: 500), () {
                   messagesScrollController.jumpTo(
                       messagesScrollController.position.maxScrollExtent);
+                });
+
+                messagesScrollController.addListener(() {
+                  if (messagesScrollController.position.pixels < 500 &&
+                      !oldMsgsLoading && messagesScrollController.position.userScrollDirection == ScrollDirection.forward) {
+                    print('At the top');
+                    setState(() {
+                      oldMsgsLoading = true;
+                      numberOfMessages += 35;
+                    });
+                    db
+                        .collection('chats')
+                        .doc(widget.data['id'])
+                        .collection('msgs')
+                        .orderBy('time')
+                        .limitToLast(numberOfMessages)
+                        .get()
+                        .then((value) {
+                      setState(() {
+                        oldMsgsLoading = false;
+                        messages = value.docs;
+                      });
+                    });
+                  }
                 });
               });
             },
@@ -112,7 +139,8 @@ class _ChatState extends State<Chat> {
                   controller: messagesScrollController,
                   child: Column(
                       mainAxisSize: MainAxisSize.min,
-                      children: renderMessages(context, members, messages)))
+                      children: renderMessages(
+                          context, members, messages, oldMsgsLoading)))
               : Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -196,8 +224,15 @@ String getLocalTime(int item) {
   return time;
 }
 
-List<Widget> renderMessages(context, members, messages) {
-  List<Widget> mesagesEls = [];
+List<Widget> renderMessages(context, members, messages, oldMsgsLoading) {
+  List<Widget> mesagesEls = !oldMsgsLoading
+      ? []
+      : [
+          Center(
+              child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 5),
+                  child: CircularProgressIndicator()))
+        ];
   Map previousMsg = {};
   for (var item in messages) {
     Widget el;
@@ -215,6 +250,12 @@ List<Widget> renderMessages(context, members, messages) {
               child: SelectableText(DateFormat.yMEd().format(
                   DateTime.fromMillisecondsSinceEpoch(item['time']))))));
     }
+    // if (item['type'] == 'loading') {
+    //   el = Center(
+    //       child: Padding(
+    //           padding: EdgeInsets.symmetric(vertical: 5),
+    //           child: CircularProgressIndicator()));
+    // } else
     if (item['type'] == 'meta') {
       el = Center(
           child: Padding(
