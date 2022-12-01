@@ -47,6 +47,7 @@ dependencies:
   ezanimation: ^0.6.0
   uuid: ^3.0.7
   skeletons: ^0.0.3
+  update_helper: ^0.1.0
 
 dev_dependencies:
   flutter_test:
