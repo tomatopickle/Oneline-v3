@@ -239,40 +239,46 @@ class _NewPersonalChatState extends State<NewPersonalChat> {
                               }
                             });
                           }
-                        });
-                        return;
-                        var id = Uuid().v1();
-                        int time = DateTime.now().millisecondsSinceEpoch;
-                        Map<String, dynamic> chatData = {
-                          'id': id,
-                          'type': 'dm',
-                          'members': <String>[
-                            selectedUser['uid'],
-                            widget.userData['uid']
-                          ],
-                          'creation_time': time
-                        };
-                        db
-                            .collection("chats")
-                            .doc(id)
-                            .collection('data')
-                            .doc('chatData')
-                            .set(chatData);
-                        db.collection("chats").doc(id).collection('msgs').add({
-                          'type': 'meta',
-                          'text': 'New chat created',
-                          'time': time,
-                          'meta_type': 'server_info'
-                        });
-                        chatData['members'].forEach((uid) {
+                          if (chatAlrExists) {
+                            return;
+                          }
+                          var id = Uuid().v1();
+                          int time = DateTime.now().millisecondsSinceEpoch;
+                          Map<String, dynamic> chatData = {
+                            'id': id,
+                            'type': 'dm',
+                            'members': <String>[
+                              selectedUser['uid'],
+                              widget.userData['uid']
+                            ],
+                            'creation_time': time
+                          };
                           db
-                              .collection('users')
-                              .doc(uid)
-                              .collection('chats')
+                              .collection("chats")
                               .doc(id)
+                              .collection('data')
+                              .doc('chatData')
                               .set(chatData);
+                          db
+                              .collection("chats")
+                              .doc(id)
+                              .collection('msgs')
+                              .add({
+                            'type': 'meta',
+                            'text': 'New chat created',
+                            'time': time,
+                            'meta_type': 'server_info'
+                          });
+                          chatData['members'].forEach((uid) {
+                            db
+                                .collection('users')
+                                .doc(uid)
+                                .collection('chats')
+                                .doc(id)
+                                .set(chatData);
+                          });
+                          Navigator.pop(context);
                         });
-                        Navigator.pop(context);
                       },
                       icon: const Icon(Icons.add),
                       label: const Text('Create Chat'),
