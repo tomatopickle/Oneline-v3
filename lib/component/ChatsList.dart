@@ -45,7 +45,9 @@ Widget UserInfo(context, User? user) {
       Opacity(
         opacity: 0.5,
         child: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            showAboutDialog(context: context);
+          },
           icon: const Icon(Icons.settings_outlined),
           tooltip: 'Settings',
         ),
