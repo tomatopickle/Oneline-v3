@@ -6,6 +6,7 @@ import 'package:oneline/main.dart';
 import 'package:skeletons/skeletons.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -45,7 +46,7 @@ class _ChatState extends State<Chat> {
               .doc(widget.data['id'])
               .collection('msgs')
               .orderBy('time')
-              .limitToLast(25)
+              .limitToLast(35)
               .snapshots()
               .listen(
             (event) {
@@ -112,28 +113,8 @@ class _ChatState extends State<Chat> {
                   child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: renderMessages(context, members, messages)))
-              : Column(
-                  children: [
-                    for (var i in List.filled(5, ''))
-                      Row(
-                        children: [
-                          SkeletonAvatar(
-                              style: SkeletonAvatarStyle(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(130)))),
-                          SizedBox(
-                            width: 15,
-                            height: 75,
-                          ),
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                                height: 25,
-                                width: MediaQuery.of(context).size.width - 450,
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                        ],
-                      )
-                  ],
+              : Center(
+                  child: CircularProgressIndicator(),
                 ),
         ),
         bottomNavigationBar: BottomAppBar(
@@ -221,15 +202,30 @@ List<Widget> renderMessages(context, members, messages) {
   for (var item in messages) {
     Widget el;
     Map msgData = item.data();
-    if (item['type'] == 'meta') {
-      el = Center(
+    if (previousMsg.isNotEmpty &&
+        DateTime.fromMillisecondsSinceEpoch(item['time']).day !=
+            DateTime.fromMillisecondsSinceEpoch(previousMsg['time']).day) {
+      mesagesEls.add(Center(
           child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(75),
                 color: Theme.of(context).canvasColor,
               ),
               padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-              child: Text(msgData['text'])));
+              child: SelectableText(DateFormat.yMEd().format(
+                  DateTime.fromMillisecondsSinceEpoch(item['time']))))));
+    }
+    if (item['type'] == 'meta') {
+      el = Center(
+          child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 5),
+              child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(75),
+                    color: Theme.of(context).canvasColor,
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  child: Text(msgData['text']))));
     } else {
       el = Padding(
           padding: EdgeInsets.only(
