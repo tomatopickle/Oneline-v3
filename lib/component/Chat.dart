@@ -33,6 +33,21 @@ class _ChatState extends State<Chat> {
   int numberOfMessages = 35;
   @override
   void initState() {
+    print('startin');
+    loadMessages();
+    super.initState();
+  }
+
+  void didUpdateWidget(oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // In case props change
+    loadMessages();
+  }
+
+  void loadMessages() {
+    setState(() {
+      messages = [];
+    });
     db
         .collection("chats")
         .doc(widget.data['id'])
@@ -55,15 +70,16 @@ class _ChatState extends State<Chat> {
             (event) {
               setState(() {
                 messages = event.docs;
-                Future.delayed(Duration(milliseconds: 500), () {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
                   messagesScrollController.jumpTo(
                       messagesScrollController.position.maxScrollExtent);
                 });
 
                 messagesScrollController.addListener(() {
                   if (messagesScrollController.position.pixels < 500 &&
-                      !oldMsgsLoading && messagesScrollController.position.userScrollDirection == ScrollDirection.forward) {
-                    print('At the top');
+                      !oldMsgsLoading &&
+                      messagesScrollController.position.userScrollDirection ==
+                          ScrollDirection.forward) {
                     setState(() {
                       oldMsgsLoading = true;
                       numberOfMessages += 35;
@@ -90,8 +106,6 @@ class _ChatState extends State<Chat> {
         });
       });
     });
-
-    super.initState();
   }
 
   void sendMessage() {
@@ -250,12 +264,7 @@ List<Widget> renderMessages(context, members, messages, oldMsgsLoading) {
               child: SelectableText(DateFormat.yMEd().format(
                   DateTime.fromMillisecondsSinceEpoch(item['time']))))));
     }
-    // if (item['type'] == 'loading') {
-    //   el = Center(
-    //       child: Padding(
-    //           padding: EdgeInsets.symmetric(vertical: 5),
-    //           child: CircularProgressIndicator()));
-    // } else
+
     if (item['type'] == 'meta') {
       el = Center(
           child: Padding(

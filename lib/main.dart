@@ -163,8 +163,8 @@ class _HomePageState extends State<HomePage> {
                     'Hello, this is the new Oneline, aka Oneline V3',
                     style: Theme.of(context).textTheme.headline4,
                   ),
-                )),
-          if (chatData.isNotEmpty)
+                ))
+          else
             Expanded(
                 flex: 7500,
                 child: Chat(
@@ -192,7 +192,6 @@ class AuthGate extends StatelessWidget {
             if (!snapshot.hasData) {
               return const SignInScreen(providerConfigs: [
                 EmailProviderConfiguration(),
-                
                 GoogleProviderConfiguration(
                   clientId:
                       '227786802933-cgduhj8mkmulnorm9947n42tn6s60gp7.apps.googleusercontent.com',
