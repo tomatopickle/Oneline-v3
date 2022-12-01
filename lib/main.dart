@@ -120,24 +120,28 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         body: PwaUpdateListener(
       onReady: () {
-        /// Show a snackbar to get users to reload into a newer version
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Expanded(child: Text('A new update is ready')),
-                TextButton(
-                  onPressed: () {
-                    reloadPwa();
-                  },
-                  child: Text('UPDATE'),
-                ),
-              ],
-            ),
-            duration: Duration(days: 365),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        showDialog(
+            context: context,
+            builder: ((context) {
+              return AlertDialog(
+                title: const Text('Update Available'),
+                content: const Text('A new update is ready'),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Reload'),
+                    onPressed: () {
+                      reloadPwa();
+                    },
+                  ),
+                  TextButton(
+                    child: const Text('Later'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            }));
       },
       child: Row(
         children: <Widget>[
