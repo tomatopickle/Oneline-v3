@@ -303,7 +303,7 @@ List<Widget> renderMessages(context, members, messages, oldMsgsLoading) {
                             ))))
               else
                 SizedBox(
-                  //Just to get that extra space
+                  //Just to get that extra space when avatar is not there
                   width: 42.5,
                   height: 0,
                 ),
@@ -334,10 +334,30 @@ List<Widget> renderMessages(context, members, messages, oldMsgsLoading) {
                           ),
                         ],
                       ),
-                    SelectableText(
-                      msgData['text'],
-                      style: TextStyle(fontSize: 17.5),
-                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: SelectableText(
+                          msgData['text'],
+                          style: TextStyle(fontSize: 17.5),
+                        )),
+                        if ((DateTime.fromMillisecondsSinceEpoch(
+                                        msgData['time'])
+                                    .difference(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            previousMsg['time']))
+                                    .inMinutes >
+                                5) &&
+                            previousMsg['sender'] == msgData['sender'])
+                          Opacity(
+                            opacity: 0.5,
+                            child: SelectableText(
+                              getLocalTime(msgData['time']),
+                              style: Theme.of(context).textTheme.labelSmall,
+                            ),
+                          ),
+                      ],
+                    )
                   ]))
             ],
           ));
