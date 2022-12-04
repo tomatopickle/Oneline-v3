@@ -61,6 +61,15 @@ class _AppState extends State<App> {
     super.initState();
   }
 
+  FlexScheme? getTheme() {
+    for (var t in FlexScheme.values) {
+      if (t.toString().replaceAll('FlexScheme.', '') ==
+          settings['appearance']['theme']) {
+        return t;
+      }
+    }
+  }
+
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Oneline',
@@ -77,7 +86,9 @@ class _AppState extends State<App> {
         fontFamily: GoogleFonts.notoSans().fontFamily,
       ),
       darkTheme: FlexThemeData.dark(
-        scheme: FlexScheme.flutterDash,
+        scheme: settings['appearance']['theme'] != null
+            ? getTheme()
+            : FlexScheme.flutterDash,
         surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
         blendLevel: 15,
         subThemesData: const FlexSubThemesData(

@@ -49,7 +49,7 @@ dependencies:
   skeletons: ^0.0.3
   pwa_update_listener: ^0.1.0
   vertical_tabs_flutter: ^1.0.0
-  settings_ui: ^2.0.2
+  # settings_ui: ^2.0.2
 
 dev_dependencies:
   flutter_test:
