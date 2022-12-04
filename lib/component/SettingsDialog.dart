@@ -29,6 +29,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
         .get()
         .then((event) {
       setState(() {
+        // TODO: fix theme issues
         var e = {...event.data()?['settings'], ...settings};
         settings = e;
       });
