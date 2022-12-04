@@ -47,6 +47,9 @@ class _AppState extends State<App> {
   @override
   void initState() {
     print('DATA');
+    if (FirebaseAuth.instance.currentUser?.uid.isEmpty ?? true) {
+      return;
+    }
     print(FirebaseAuth.instance.currentUser?.uid);
     db
         .collection("users")
