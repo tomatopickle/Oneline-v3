@@ -539,6 +539,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.1.0"
+  settings_ui:
+    dependency: "direct main"
+    description:
+      name: settings_ui
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.2"
   side_sheet:
     dependency: "direct main"
     description:
@@ -649,6 +656,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
+  vertical_tabs_flutter:
+    dependency: "direct main"
+    description:
+      name: vertical_tabs_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   visibility_detector:
     dependency: transitive
     description:

@@ -32,21 +32,41 @@ Future<void> main() async {
   runApp(App(db: db));
 }
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key, required this.db});
   final FirebaseFirestore db;
 
   @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  Map settings = {
+    'appearance': {'darkMode': true}
+  };
+  @override
+  void initState() {
+    print('DATA');
+    print(FirebaseAuth.instance.currentUser?.uid);
+    db
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .snapshots()
+        .listen((event) {
+      print(event.data());
+      setState(() {
+        settings = event.data()?['settings'];
+      });
+    });
+    super.initState();
+  }
+
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Oneline',
-// This theme was made for FlexColorScheme version 6.1.1. Make sure
-// you use same or higher version, but still same major version. If
-// you use a lower version, some properties may not be supported. In
-// that case you can also remove them after copying the theme to your app.
       theme: FlexThemeData.light(
         scheme: FlexScheme.flutterDash,
-        surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+        surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
         blendLevel: 9,
         subThemesData: const FlexSubThemesData(
           blendOnLevel: 10,
@@ -67,7 +87,8 @@ class App extends StatelessWidget {
         // To use the Playground font, add GoogleFonts package and uncomment
         fontFamily: GoogleFonts.notoSans().fontFamily,
       ),
-
+      themeMode:
+          settings['appearance']['darkMode'] ? ThemeMode.dark : ThemeMode.light,
       routes: {
         '/': (context) => AuthGate(),
         '/auth': (context) => AuthGate(),
@@ -85,6 +106,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List messages = [];
+  Map settings = {
+    'appearance': {'darkMode': true}
+  };
   Map chatData = {};
   @override
   void initState() {
@@ -109,7 +133,7 @@ class _HomePageState extends State<HomePage> {
     db
         .collection("users")
         .doc(widget.user?.uid)
-        .set(user)
+        .update(user)
         .onError((e, _) => debugPrint("Error writing document: $e"));
 
     super.initState();
@@ -148,7 +172,7 @@ class _HomePageState extends State<HomePage> {
           Expanded(
               flex: 2500,
               child: Container(
-                  color: Colors.black45,
+                  color: Theme.of(context).backgroundColor,
                   child: StreamBuilder<QuerySnapshot>(
                     stream: db
                         .collection('users')
@@ -158,15 +182,16 @@ class _HomePageState extends State<HomePage> {
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         return ChatLists(
-                            user: widget.user,
-                            userData: userDbData,
-                            data: snapshot.data?.docs ?? [],
-                            openChat: (data) {
-                              print('Chat opened');
-                              setState(() {
-                                chatData = data;
-                              });
+                          user: widget.user,
+                          userData: userDbData,
+                          data: snapshot.data?.docs ?? [],
+                          openChat: (data) {
+                            print('Chat opened');
+                            setState(() {
+                              chatData = data;
                             });
+                          },
+                        );
                       }
 
                       if (snapshot.hasError) {
@@ -204,8 +229,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class AuthGate extends StatelessWidget {
-  const AuthGate({Key? key}) : super(key: key);
-
+  const AuthGate({super.key});
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(

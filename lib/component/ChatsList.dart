@@ -7,6 +7,7 @@ import 'package:side_sheet/side_sheet.dart';
 import 'NewChat.dart';
 import 'package:ezanimation/ezanimation.dart';
 import 'package:skeletons/skeletons.dart';
+import './SettingsDialog.dart';
 
 Widget UserInfo(context, User? user) {
   return Row(
@@ -23,6 +24,7 @@ Widget UserInfo(context, User? user) {
                       onTap: () {},
                       child: FancyAvatar(
                         radius: 130,
+                        shadowColor: Colors.transparent,
                         userImage: Image.network(
                           fit: BoxFit.cover,
                           user?.photoURL ??
@@ -46,7 +48,11 @@ Widget UserInfo(context, User? user) {
         opacity: 0.5,
         child: IconButton(
           onPressed: () {
-            showAboutDialog(context: context,applicationVersion: '1.1.7');
+            showDialog(
+                context: context,
+                builder: (_) {
+                  return SettingsDialog(user: user);
+                });
           },
           icon: const Icon(Icons.settings_outlined),
           tooltip: 'Settings',
@@ -127,30 +133,32 @@ class _ChatListsState extends State<ChatLists> {
                                 var chatName = userData!['displayName'] ??
                                     userData['email'] ??
                                     'No Name';
-                                return ListTile(
-                                    onTap: () {
-                                      var chat = data[index].data();
-                                      print(chat);
-                                      chat['otherUserData'] = userData;
-                                      widget.openChat!(chat);
-                                    },
-                                    leading: SizedBox(
-                                      height: 50,
-                                      width: 50,
-                                      child: FancyAvatar(
-                                        radius: 130,
-                                        ringWidth: 0,
-                                        ringColor: Colors.transparent,
-                                        userImage: Image.network(
-                                          userData['photoURL'] ??
-                                              'https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png',
-                                          fit: BoxFit.cover,
+                                return Material(
+                                    child: ListTile(
+                                        onTap: () {
+                                          var chat = data[index].data();
+                                          print(chat);
+                                          chat['otherUserData'] = userData;
+                                          widget.openChat!(chat);
+                                        },
+                                        leading: SizedBox(
+                                          height: 50,
+                                          width: 50,
+                                          child: FancyAvatar(
+                                            radius: 130,
+                                            shadowColor: Colors.transparent,
+                                            ringWidth: 0,
+                                            ringColor: Colors.transparent,
+                                            userImage: Image.network(
+                                              userData['photoURL'] ??
+                                                  'https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png',
+                                              fit: BoxFit.cover,
+                                            ),
+                                            avatarBackgroundColor:
+                                                Colors.transparent,
+                                          ),
                                         ),
-                                        avatarBackgroundColor:
-                                            Colors.transparent,
-                                      ),
-                                    ),
-                                    title: Text(chatName));
+                                        title: Text(chatName)));
                               }
                               return ListTile(
                                 leading: CircularProgressIndicator(),
