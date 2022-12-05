@@ -108,7 +108,7 @@ class _ChatState extends State<Chat> {
     });
   }
 
-  void xsendMessage() {
+  void sendMessage() {
     if (messageInputController.text.isEmpty) {
       return;
     }
