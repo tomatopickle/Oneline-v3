@@ -14,17 +14,19 @@ import 'package:flutterfire_ui/auth.dart';
 import 'component/ChatsList.dart';
 import 'component/Chat.dart';
 import 'package:pwa_update_listener/pwa_update_listener.dart';
+import 'package:web_browser_detect/web_browser_detect.dart';
 
 FirebaseFirestore db = FirebaseFirestore.instance;
 Map<String, dynamic> userDbData = {};
 Future<void> main() async {
+  final browser = Browser();
   WidgetsFlutterBinding.ensureInitialized();
-
+  print(browser.browser);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  if (kReleaseMode) {
+  if (kReleaseMode && browser.browser != 'Safari') {
     db.settings = const Settings(persistenceEnabled: true);
     await db
         .enablePersistence(const PersistenceSettings(synchronizeTabs: true));
