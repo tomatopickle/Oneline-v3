@@ -108,7 +108,10 @@ class _ChatState extends State<Chat> {
     });
   }
 
-  void sendMessage() {
+  void xsendMessage() {
+    if (messageInputController.text.isEmpty) {
+      return;
+    }
     int time = DateTime.now().millisecondsSinceEpoch;
     db.collection("chats").doc(widget.data['id']).collection('msgs').add({
       'type': 'text',
