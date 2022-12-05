@@ -91,7 +91,9 @@ class _AppState extends State<App> {
     return MaterialApp(
       title: 'Oneline',
       theme: FlexThemeData.light(
-        scheme: FlexScheme.flutterDash,
+        scheme: settings['appearance']['theme'] != null
+            ? getTheme()
+            : FlexScheme.flutterDash,
         surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
         blendLevel: 9,
         subThemesData: const FlexSubThemesData(
