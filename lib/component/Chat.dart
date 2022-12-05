@@ -12,9 +12,14 @@ import 'package:intl/intl.dart';
 FirebaseFirestore db = FirebaseFirestore.instance;
 
 class Chat extends StatefulWidget {
-  Chat({super.key, required this.data, required this.user});
+  Chat(
+      {super.key,
+      required this.data,
+      required this.user,
+      required this.onClose});
   final Map data;
   final Map user;
+  final Function onClose;
   @override
   State<Chat> createState() => _ChatState();
 }
@@ -143,22 +148,40 @@ class _ChatState extends State<Chat> {
       'photoURL': widget.data['otherUserData']['photoURL'] ??
           'https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png',
     };
+    bool mobile = false;
+
+    if (MediaQuery.of(context).size.width < 600) {
+      if (!mobile) {
+        setState(() {
+          mobile = true;
+        });
+      }
+    }
     return Scaffold(
       appBar: AppBar(
-        leading: SizedBox(
-            width: 50,
-            height: 42.5,
-            child: CircleAvatar(
-                radius: 130,
-                backgroundColor: Colors.transparent,
-                child: ClipOval(
-                    clipBehavior: Clip.hardEdge,
-                    child: Image.network(
-                      chatData['photoURL'],
-                      fit: BoxFit.cover,
-                      height: 42.5,
-                      scale: 0.25,
-                    )))),
+        leading: Row(children: [
+          if (mobile == true)
+            IconButton(
+                onPressed: () {
+                  widget.onClose();
+                },
+                icon: Icon(Icons.arrow_back_rounded)),
+          SizedBox(
+              width: 50,
+              height: 42.5,
+              child: CircleAvatar(
+                  radius: 130,
+                  backgroundColor: Colors.transparent,
+                  child: ClipOval(
+                      clipBehavior: Clip.hardEdge,
+                      child: Image.network(
+                        chatData['photoURL'],
+                        fit: BoxFit.cover,
+                        height: 42.5,
+                        scale: 0.25,
+                      ))))
+        ]),
+        leadingWidth: mobile == true ? 100 : 50,
         title: Text(chatData['name']),
         backgroundColor: Theme.of(context).backgroundColor,
       ),

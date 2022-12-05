@@ -46,6 +46,7 @@ class _AppState extends State<App> {
   Map settings = {
     'appearance': {'darkMode': true}
   };
+  bool mobile = false;
   @override
   void initState() {
     print('DATA');
@@ -142,6 +143,7 @@ class _HomePageState extends State<HomePage> {
     'appearance': {'darkMode': true}
   };
   Map chatData = {};
+
   @override
   void initState() {
     debugPrint(widget.user.toString());
@@ -173,6 +175,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    bool mobile = false;
+
+    if (MediaQuery.of(context).size.width < 600) {
+      if (!mobile) {
+        setState(() {
+          mobile = true;
+        });
+      }
+    }
     return Scaffold(
         body: PwaUpdateListener(
       onReady: () {
@@ -201,41 +212,42 @@ class _HomePageState extends State<HomePage> {
       },
       child: Row(
         children: <Widget>[
-          Expanded(
-              flex: 2500,
-              child: Container(
-                  color: Theme.of(context).backgroundColor,
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: db
-                        .collection('users')
-                        .doc(widget.user?.uid)
-                        .collection('chats')
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return ChatLists(
-                          user: widget.user,
-                          userData: userDbData,
-                          data: snapshot.data?.docs ?? [],
-                          openChat: (data) {
-                            print('Chat opened');
-                            setState(() {
-                              chatData = data;
-                            });
-                          },
+          if (chatData.isEmpty || !mobile)
+            Expanded(
+                flex: 2500,
+                child: Container(
+                    color: Theme.of(context).backgroundColor,
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: db
+                          .collection('users')
+                          .doc(widget.user?.uid)
+                          .collection('chats')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return ChatLists(
+                            user: widget.user,
+                            userData: userDbData,
+                            data: snapshot.data?.docs ?? [],
+                            openChat: (data) {
+                              print('Chat opened');
+                              setState(() {
+                                chatData = data;
+                              });
+                            },
+                          );
+                        }
+
+                        if (snapshot.hasError) {
+                          return Text('Error');
+                        }
+
+                        return const Center(
+                          child: CircularProgressIndicator(),
                         );
-                      }
-
-                      if (snapshot.hasError) {
-                        return Text('Error');
-                      }
-
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    },
-                  ))),
-          if (chatData.isEmpty)
+                      },
+                    ))),
+          if (chatData.isEmpty && !mobile)
             Expanded(
                 flex: 7500,
                 child: Padding(
@@ -247,13 +259,17 @@ class _HomePageState extends State<HomePage> {
                     style: Theme.of(context).textTheme.headline4,
                   ),
                 ))
-          else
+          else if (!mobile || chatData.isNotEmpty)
             Expanded(
                 flex: 7500,
                 child: Chat(
-                  data: chatData,
-                  user: userDbData,
-                )),
+                    data: chatData,
+                    user: userDbData,
+                    onClose: () {
+                      setState(() {
+                        chatData = {};
+                      });
+                    })),
         ],
       ),
     ));
