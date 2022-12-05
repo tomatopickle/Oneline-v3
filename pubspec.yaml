@@ -50,6 +50,7 @@ dependencies:
   pwa_update_listener: ^0.1.0
   vertical_tabs_flutter: ^1.0.0
   web_browser_detect: ^2.0.3
+  jiffy: ^5.0.0
 
 dev_dependencies:
   flutter_test:

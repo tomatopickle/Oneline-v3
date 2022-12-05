@@ -8,6 +8,7 @@ import 'package:skeletons/skeletons.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:jiffy/jiffy.dart';
 
 FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -200,7 +201,34 @@ class _ChatState extends State<Chat> {
                       ))))
         ]),
         leadingWidth: mobile == true ? 100 : 50,
-        title: Text(chatData['name']),
+        title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(chatData['name']),
+          Padding(
+            padding: const EdgeInsets.only(left: 7),
+            child: FutureBuilder(
+              future: db
+                  .collection('users')
+                  .doc(widget.data['otherUserData']['uid'])
+                  .get(),
+              builder: (_, snapshot) {
+                if (snapshot.hasData) {
+                  print(snapshot.data?.data());
+
+                  return Text(
+                    Jiffy(snapshot.data
+                            ?.data()!['metaData']['lastSignInTime']
+                            .toDate())
+                        .fromNow(),
+                    style: Theme.of(context).textTheme.labelSmall,
+                  );
+                } else {
+                  return Text('',
+                      style: Theme.of(context).textTheme.labelSmall);
+                }
+              },
+            ),
+          )
+        ]),
         backgroundColor: Theme.of(context).backgroundColor,
       ),
       body: Padding(

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 
+import 'package:jiffy/jiffy.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -49,16 +50,12 @@ class _AppState extends State<App> {
   bool mobile = false;
   @override
   void initState() {
-    print('DATA');
-    // if (FirebaseAuth.instance.currentUser?.uid.isEmpty ?? true) {
-    //   return;
-    // }
-
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user == null) {
         print('User is currently signed out!');
       } else {
-        print(FirebaseAuth.instance.currentUser?.uid);
+        print(Jiffy(FirebaseAuth.instance.currentUser?.metadata.lastSignInTime)
+            .fromNow());
         db
             .collection("users")
             .doc(FirebaseAuth.instance.currentUser?.uid)
