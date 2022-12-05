@@ -47,31 +47,33 @@ class _AppState extends State<App> {
   @override
   void initState() {
     print('DATA');
-    if (FirebaseAuth.instance.currentUser?.uid.isEmpty ?? true) {
-      return;
-    }
-    print(FirebaseAuth.instance.currentUser?.uid);
-    print('USER EXISTS');
-    // db
-    //     .collection("users")
-    //     .doc(FirebaseAuth.instance.currentUser?.uid)
-    //     .get()
-    //     .then((event) {
-    //   setState(() {
-    //     settings = event.data()?['settings'];
-    //     print(settings);
-    //   });
-    // });
-    db
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser?.uid)
-        .snapshots()
-        .listen((event) {
-      setState(() {
-        if (event.data()?['settings'] != null) {
-          settings = event.data()?['settings'];
-        }
-      });
+    // if (FirebaseAuth.instance.currentUser?.uid.isEmpty ?? true) {
+    //   return;
+    // }
+
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        print('User is currently signed out!');
+      } else {
+        print(FirebaseAuth.instance.currentUser?.uid);
+        db
+            .collection("users")
+            .doc(FirebaseAuth.instance.currentUser?.uid)
+            .snapshots()
+            .listen(
+          (event) {
+            print('EVENT');
+            setState(() {
+              if (event.data()?['settings'] != null) {
+                settings = event.data()?['settings'];
+              }
+            });
+          },
+          onError: (error) {
+            print(error);
+          },
+        );
+      }
     });
     super.initState();
   }
