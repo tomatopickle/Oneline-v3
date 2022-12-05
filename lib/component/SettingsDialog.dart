@@ -82,10 +82,25 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 value: Text(settings['appearance']['theme']),
                 trailing: DropdownButton(
                   value: theme,
+                  underline: SizedBox(),
                   items: [
                     for (var t in themes)
                       DropdownMenuItem(
-                        child: Text(t['name']),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 25,
+                              height: 25,
+                              decoration: BoxDecoration(
+                                  color: t['color'],
+                                  borderRadius: BorderRadius.circular(5)),
+                            ),
+                            SizedBox(
+                              width: 15,
+                            ),
+                            Text(t['name'])
+                          ],
+                        ),
                         value: t,
                         onTap: (() {
                           setState(() {
