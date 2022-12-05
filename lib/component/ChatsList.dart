@@ -87,6 +87,33 @@ class ChatLists extends StatefulWidget {
 }
 
 class _ChatListsState extends State<ChatLists> {
+  List messagePreviews = [];
+  void initState() {
+    messagePreviews = List.generate((widget.data?.length ?? 1), (y) => y + 1);
+    loadMessagePreviews();
+    super.initState();
+  }
+
+  void loadMessagePreviews() {
+    for (int i
+        in List<int>.generate((widget.data?.length ?? 1), (y) => y + 1)) {
+      i = i - 1;
+      var el = widget.data?[i];
+      db
+          .collection('chats')
+          .doc(el.data()['id'])
+          .collection('data')
+          .doc('lastMessage')
+          .snapshots()
+          .listen((event) {
+        setState(() {
+          messagePreviews[i] = event.data();
+        });
+      });
+    }
+    ;
+  }
+
   @override
   Widget build(BuildContext context) {
     bool chatsEmpty = widget.data?.isEmpty ?? true;
@@ -146,7 +173,6 @@ class _ChatListsState extends State<ChatLists> {
                                     child: ListTile(
                                         onTap: () {
                                           var chat = data[index].data();
-                                          print(chat);
                                           chat['otherUserData'] = userData;
                                           widget.openChat!(chat);
                                         },
@@ -167,7 +193,39 @@ class _ChatListsState extends State<ChatLists> {
                                                 Colors.transparent,
                                           ),
                                         ),
-                                        title: Text(chatName)));
+                                        title: Text(chatName),
+                                        subtitle: Row(
+                                          children: [
+                                            Expanded(
+                                                child: Tooltip(
+                                              waitDuration:
+                                                  Duration(milliseconds: 500),
+                                              message: messagePreviews[index]
+                                                  ['text'],
+                                              child: Text(
+                                                chatName +
+                                                    ': ' +
+                                                    messagePreviews[index]
+                                                        ['text'],
+                                                maxLines: 1,
+                                                softWrap: false,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            )),
+                                            SizedBox(width: 10),
+                                            Opacity(
+                                              opacity: 0.7,
+                                              child: Text(
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .labelSmall,
+                                                getLocalTime(
+                                                    messagePreviews[index]
+                                                        ['time']),
+                                              ),
+                                            )
+                                          ],
+                                        )));
                               }
                               return ListTile(
                                 leading: CircularProgressIndicator(),
@@ -222,9 +280,29 @@ Future getDmUser(String userUid, List members) {
   members.forEach((element) {
     if (userUid != element) {
       uid = element;
-      print(uid);
     }
   });
 
   return db.collection('users').doc(uid).get();
+}
+
+Future getLastMessage(String chatId) {
+  return db
+      .collection('chats')
+      .doc(chatId)
+      .collection('data')
+      .doc('lastMessage')
+      .get();
+}
+
+String getLocalTime(int item) {
+  var dateObj = DateTime.fromMillisecondsSinceEpoch(item);
+  var time = (dateObj.hour < 13
+          ? dateObj.hour.toString()
+          : (dateObj.hour - 12).toString()) +
+      ':' +
+      ((dateObj.minute != 0) ? dateObj.minute.toString() : '00') +
+      ' ' +
+      (dateObj.hour < 13 ? 'AM' : 'PM');
+  return time;
 }

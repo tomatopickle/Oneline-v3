@@ -131,12 +131,23 @@ class _ChatState extends State<Chat> {
       return;
     }
     int time = DateTime.now().millisecondsSinceEpoch;
-    db.collection("chats").doc(widget.data['id']).collection('msgs').add({
+    Map<String, dynamic> message = {
       'type': 'text',
       'text': messageInputController.text,
       'time': time,
       'sender': widget.user['uid']
-    });
+    };
+    db
+        .collection("chats")
+        .doc(widget.data['id'])
+        .collection('msgs')
+        .add(message);
+    db
+        .collection("chats")
+        .doc(widget.data['id'])
+        .collection('data')
+        .doc('lastMessage')
+        .set(message);
     messageInputController.clear();
   }
 
