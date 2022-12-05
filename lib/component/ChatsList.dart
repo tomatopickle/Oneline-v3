@@ -91,6 +91,15 @@ class _ChatListsState extends State<ChatLists> {
   Widget build(BuildContext context) {
     bool chatsEmpty = widget.data?.isEmpty ?? true;
     List data = widget.data ?? [];
+    bool mobile = false;
+
+    if (MediaQuery.of(context).size.width < 600) {
+      if (!mobile) {
+        setState(() {
+          mobile = true;
+        });
+      }
+    }
     return Stack(
       children: [
         Column(
@@ -177,7 +186,9 @@ class _ChatListsState extends State<ChatLists> {
           child: FloatingActionButton.extended(
             onPressed: () {
               SideSheet.left(
-                  width: MediaQuery.of(context).size.width / 4,
+                  width: mobile == true
+                      ? MediaQuery.of(context).size.width
+                      : MediaQuery.of(context).size.width / 4,
                   body: NewChat(userData: widget.userData),
                   context: context);
             },
