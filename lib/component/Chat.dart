@@ -256,6 +256,7 @@ List<Widget> renderMessages(context, members, messages, oldMsgsLoading) {
             DateTime.fromMillisecondsSinceEpoch(previousMsg['time']).day) {
       mesagesEls.add(Center(
           child: Container(
+              margin: EdgeInsets.symmetric(vertical: 15),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(75),
                 color: Theme.of(context).canvasColor,
@@ -315,6 +316,7 @@ List<Widget> renderMessages(context, members, messages, oldMsgsLoading) {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                     if (previousMsg['sender'] != msgData['sender'])
+                      // The user avatar UI
                       Row(
                         children: [
                           Opacity(

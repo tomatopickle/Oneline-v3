@@ -2,10 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:vertical_tabs_flutter/vertical_tabs.dart';
 import '../packages/settings_ui/settings_ui.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'dart:convert';
 
 class SettingsDialog extends StatefulWidget {
   const SettingsDialog({super.key, required this.user});
@@ -29,9 +27,13 @@ class _SettingsDialogState extends State<SettingsDialog> {
         .get()
         .then((event) {
       setState(() {
-        // TODO: fix theme issues
-        var e = {...event.data()?['settings'], ...settings};
-        settings = e;
+        Map data = event.data()?['settings'] ?? {};
+        settings.forEach((key, value) {
+          if (data[key] == null) {
+            data[key] = settings[key];
+          }
+        });
+        settings = data;
       });
     });
 

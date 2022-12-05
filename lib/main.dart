@@ -51,14 +51,26 @@ class _AppState extends State<App> {
       return;
     }
     print(FirebaseAuth.instance.currentUser?.uid);
+    print('USER EXISTS');
+    // db
+    //     .collection("users")
+    //     .doc(FirebaseAuth.instance.currentUser?.uid)
+    //     .get()
+    //     .then((event) {
+    //   setState(() {
+    //     settings = event.data()?['settings'];
+    //     print(settings);
+    //   });
+    // });
     db
         .collection("users")
         .doc(FirebaseAuth.instance.currentUser?.uid)
         .snapshots()
         .listen((event) {
-      print(event.data());
       setState(() {
-        settings = event.data()?['settings'];
+        if (event.data()?['settings'] != null) {
+          settings = event.data()?['settings'];
+        }
       });
     });
     super.initState();
@@ -147,7 +159,7 @@ class _HomePageState extends State<HomePage> {
     db
         .collection("users")
         .doc(widget.user?.uid)
-        .update(user)
+        .set(user, SetOptions(merge: true))
         .onError((e, _) => debugPrint("Error writing document: $e"));
 
     super.initState();
