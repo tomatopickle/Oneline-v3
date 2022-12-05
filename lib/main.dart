@@ -92,6 +92,7 @@ class _AppState extends State<App> {
 
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Oneline',
       theme: FlexThemeData.light(
         scheme: settings['appearance']['theme'] != null

@@ -159,6 +159,13 @@ class _ChatState extends State<Chat> {
     }
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+              onPressed: () {
+                widget.onClose();
+              },
+              icon: Icon(Icons.info)),
+        ],
         leading: Row(children: [
           if (mobile == true)
             IconButton(
