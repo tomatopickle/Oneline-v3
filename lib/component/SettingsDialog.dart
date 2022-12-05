@@ -47,7 +47,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
       // print(FlexThemeData.dark(scheme: theme).primaryColor);
       Map d = {
         'name': t.toString().replaceAll('FlexScheme.', ''),
-        'color': settings['appearance']['darkMode'] ? FlexThemeData.dark(scheme: t).primaryColor : FlexThemeData.light(scheme: t).primaryColor
+        'color': settings['appearance']['darkMode']
+            ? FlexThemeData.dark(scheme: t).primaryColor
+            : FlexThemeData.light(scheme: t).primaryColor,
+        'data': t
       };
       themes.add(d);
       if (d['name'] == settings['appearance']['theme']) {

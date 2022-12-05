@@ -31,9 +31,10 @@ class _ChatState extends State<Chat> {
   bool newMessage = false;
   bool oldMsgsLoading = false;
   int numberOfMessages = 35;
+  bool showScrollDownBtn = false;
+
   @override
   void initState() {
-    print('startin');
     loadMessages();
     super.initState();
   }
@@ -98,6 +99,18 @@ class _ChatState extends State<Chat> {
                       });
                     });
                   }
+
+                  if (messagesScrollController.offset <
+                      (messagesScrollController.position.maxScrollExtent -
+                          15)) {
+                    setState(() {
+                      showScrollDownBtn = true;
+                    });
+                  } else if (showScrollDownBtn == true) {
+                    setState(() {
+                      showScrollDownBtn = false;
+                    });
+                  }
                 });
               });
             },
@@ -131,101 +144,116 @@ class _ChatState extends State<Chat> {
           'https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png',
     };
     return Scaffold(
-        appBar: AppBar(
-          leading: SizedBox(
-              width: 50,
-              height: 42.5,
-              child: CircleAvatar(
-                  radius: 130,
-                  backgroundColor: Colors.transparent,
-                  child: ClipOval(
-                      clipBehavior: Clip.hardEdge,
-                      child: Image.network(
-                        chatData['photoURL'],
-                        fit: BoxFit.cover,
-                        height: 42.5,
-                        scale: 0.25,
-                      )))),
-          title: Text(chatData['name']),
-          backgroundColor: Theme.of(context).backgroundColor,
-        ),
-        body: Padding(
-          padding: EdgeInsets.all(10),
-          child: messages.isNotEmpty == true
-              ? SingleChildScrollView(
-                  controller: messagesScrollController,
-                  child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: renderMessages(
-                          context, members, messages, oldMsgsLoading)))
-              : Center(
-                  child: CircularProgressIndicator(),
-                ),
-        ),
-        bottomNavigationBar: BottomAppBar(
-            child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-                child: Row(children: [
-                  Expanded(
-                      child: CallbackShortcuts(
-                    bindings: {
-                      const SingleActivator(LogicalKeyboardKey.enter): () {
-                        sendMessage();
-                      },
+      appBar: AppBar(
+        leading: SizedBox(
+            width: 50,
+            height: 42.5,
+            child: CircleAvatar(
+                radius: 130,
+                backgroundColor: Colors.transparent,
+                child: ClipOval(
+                    clipBehavior: Clip.hardEdge,
+                    child: Image.network(
+                      chatData['photoURL'],
+                      fit: BoxFit.cover,
+                      height: 42.5,
+                      scale: 0.25,
+                    )))),
+        title: Text(chatData['name']),
+        backgroundColor: Theme.of(context).backgroundColor,
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(10),
+        child: messages.isNotEmpty == true
+            ? SingleChildScrollView(
+                controller: messagesScrollController,
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: renderMessages(
+                        context, members, messages, oldMsgsLoading)))
+            : Center(
+                child: CircularProgressIndicator(),
+              ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+          child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+              child: Row(children: [
+                Expanded(
+                    child: CallbackShortcuts(
+                  bindings: {
+                    const SingleActivator(LogicalKeyboardKey.enter): () {
+                      sendMessage();
                     },
-                    child: TextField(
-                      controller: messageInputController,
-                      focusNode: messageInputFocusNode,
-                      onChanged: ((value) {
-                        setState(() {});
-                        if (messageInputController.text.isNotEmpty) {
-                          if (textMessage == false) {
-                            fabRevealAnimation.reset();
-                            fabRevealAnimation.start();
-                          }
-                          textMessage = true;
-                        } else {
-                          if (textMessage == true) {
-                            fabRevealAnimation.reset();
-                            fabRevealAnimation.start();
-                          }
-                          textMessage = false;
+                  },
+                  child: TextField(
+                    controller: messageInputController,
+                    focusNode: messageInputFocusNode,
+                    onChanged: ((value) {
+                      setState(() {});
+                      if (messageInputController.text.isNotEmpty) {
+                        if (textMessage == false) {
+                          fabRevealAnimation.reset();
+                          fabRevealAnimation.start();
                         }
-                      }),
-                      maxLines: 5,
-                      minLines: 1,
-                      autofocus: true,
-                      decoration: InputDecoration(
-                          filled: true,
-                          hintText: "Message " + chatData['name']),
-                    ),
-                  )),
-                  SizedBox(width: 10),
-                  if (messageInputController.text.isEmpty == true)
-                    AnimatedBuilder(
-                        animation: fabRevealAnimation,
-                        builder: (context, snapshot) {
-                          return Transform.scale(
-                              scale: fabRevealAnimation.value,
-                              child: FloatingActionButton(
-                                onPressed: () {},
-                                child: Icon(Icons.mic_rounded),
-                              ));
-                        })
-                  else
-                    AnimatedBuilder(
-                        animation: fabRevealAnimation,
-                        builder: (context, snapshot) {
-                          return Transform.scale(
-                              scale: fabRevealAnimation.value,
-                              child: FloatingActionButton(
-                                onPressed: () {
-                                  sendMessage();
-                                },
-                                child: Icon(Icons.send_rounded),
-                              ));
-                        })
-                ]))));
+                        textMessage = true;
+                      } else {
+                        if (textMessage == true) {
+                          fabRevealAnimation.reset();
+                          fabRevealAnimation.start();
+                        }
+                        textMessage = false;
+                      }
+                    }),
+                    maxLines: 5,
+                    minLines: 1,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                        filled: true, hintText: "Message " + chatData['name']),
+                  ),
+                )),
+                SizedBox(width: 10),
+                if (messageInputController.text.isEmpty == true)
+                  AnimatedBuilder(
+                      animation: fabRevealAnimation,
+                      builder: (context, snapshot) {
+                        return Transform.scale(
+                            scale: fabRevealAnimation.value,
+                            child: FloatingActionButton(
+                              onPressed: () {},
+                              child: Icon(Icons.mic_rounded),
+                            ));
+                      })
+                else
+                  AnimatedBuilder(
+                      animation: fabRevealAnimation,
+                      builder: (context, snapshot) {
+                        return Transform.scale(
+                            scale: fabRevealAnimation.value,
+                            child: FloatingActionButton(
+                              onPressed: () {
+                                sendMessage();
+                              },
+                              child: Icon(Icons.send_rounded),
+                            ));
+                      })
+              ]))),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: AnimatedScale(
+        duration: Duration(milliseconds: 250),
+        scale: showScrollDownBtn ? 1.0 : 0.0,
+        child: ElevatedButton.icon(
+          onPressed: () {
+            messagesScrollController.animateTo(
+                messagesScrollController.position.maxScrollExtent,
+                duration: Duration(milliseconds: 500),
+                curve: Curves.fastOutSlowIn);
+          },
+          label: Text('Jump to bottom'),
+          icon: Icon(Icons.arrow_downward_rounded),
+        ),
+      ),
+    );
   }
 }
 
