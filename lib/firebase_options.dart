@@ -23,7 +23,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
@@ -49,6 +52,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '227786802933',
     projectId: 'oneline-v3',
     authDomain: 'oneline-v3.firebaseapp.com',
+    databaseURL: 'https://oneline-v3-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'oneline-v3.appspot.com',
     measurementId: 'G-1MQ8XK65MD',
   );
@@ -58,17 +62,8 @@ class DefaultFirebaseOptions {
     appId: '1:227786802933:android:c90a73194dd752619027bc',
     messagingSenderId: '227786802933',
     projectId: 'oneline-v3',
+    databaseURL: 'https://oneline-v3-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'oneline-v3.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCmxsOcG7y73ZbRDiAL9S2Oa4Ws3sPSB2U',
-    appId: '1:227786802933:ios:a85f1219d07085d29027bc',
-    messagingSenderId: '227786802933',
-    projectId: 'oneline-v3',
-    storageBucket: 'oneline-v3.appspot.com',
-    iosClientId: '227786802933-rvkol91k1dvcogg883fuejmhbakgnas3.apps.googleusercontent.com',
-    iosBundleId: 'com.example.oneline',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -76,6 +71,7 @@ class DefaultFirebaseOptions {
     appId: '1:227786802933:ios:a85f1219d07085d29027bc',
     messagingSenderId: '227786802933',
     projectId: 'oneline-v3',
+    databaseURL: 'https://oneline-v3-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'oneline-v3.appspot.com',
     iosClientId: '227786802933-rvkol91k1dvcogg883fuejmhbakgnas3.apps.googleusercontent.com',
     iosBundleId: 'com.example.oneline',

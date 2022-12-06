@@ -9,7 +9,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'dart:convert';
 
+FirebaseDatabase rDb = FirebaseDatabase.instance;
 FirebaseFirestore db = FirebaseFirestore.instance;
 
 class Chat extends StatefulWidget {
@@ -204,26 +207,26 @@ class _ChatState extends State<Chat> {
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(chatData['name']),
           Padding(
-            padding: const EdgeInsets.only(left: 7),
-            child: FutureBuilder(
-              future: db
-                  .collection('users')
-                  .doc(widget.data['otherUserData']['uid'])
-                  .get(),
+            padding: const EdgeInsets.only(left: 0),
+            child: StreamBuilder(
+              stream: rDb
+                  .ref('status/' + widget.data['otherUserData']['uid'])
+                  .onValue,
               builder: (_, snapshot) {
-                if (snapshot.hasData) {
-                  print(snapshot.data?.data());
-
+                if (snapshot.hasData && (snapshot.data != null)) {
+                  var e = snapshot.data?.snapshot.value as dynamic;
+                  print(snapshot.data?.snapshot.value?.toString() ?? '{}');
                   return Text(
-                    Jiffy(snapshot.data
-                            ?.data()!['metaData']['lastSignInTime']
-                            .toDate())
-                        .fromNow(),
+                    e['status'] == 'offline'
+                        ? ('Last online ' +
+                            Jiffy(DateTime.fromMillisecondsSinceEpoch(
+                                    e['time']))
+                                .fromNow())
+                        : 'Online',
                     style: Theme.of(context).textTheme.labelSmall,
                   );
                 } else {
-                  return Text('',
-                      style: Theme.of(context).textTheme.labelSmall);
+                  return SizedBox();
                 }
               },
             ),

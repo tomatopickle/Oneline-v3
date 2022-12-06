@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:html';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +17,8 @@ import 'package:pwa_update_listener/pwa_update_listener.dart';
 import 'package:web_browser_detect/web_browser_detect.dart';
 
 FirebaseFirestore db = FirebaseFirestore.instance;
+FirebaseDatabase rDb = FirebaseDatabase.instance;
+
 Map<String, dynamic> userDbData = {};
 Future<void> main() async {
   final browser = Browser();
@@ -54,6 +55,13 @@ class _AppState extends State<App> {
       if (user == null) {
         print('User is currently signed out!');
       } else {
+        var statusRef = FirebaseDatabase.instance.ref(
+            "status/" + (FirebaseAuth.instance.currentUser?.uid ?? '') + '');
+        statusRef.set({'status': 'online', 'time': ServerValue.timestamp});
+        statusRef
+            .onDisconnect()
+            .set({'status': 'offline', 'time': ServerValue.timestamp});
+
         print(Jiffy(FirebaseAuth.instance.currentUser?.metadata.lastSignInTime)
             .fromNow());
         db

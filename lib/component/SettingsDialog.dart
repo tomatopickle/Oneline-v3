@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../packages/settings_ui/settings_ui.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 
+
 class SettingsDialog extends StatefulWidget {
   const SettingsDialog({super.key, required this.user});
   final User? user;

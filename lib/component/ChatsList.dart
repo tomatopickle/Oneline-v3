@@ -107,7 +107,14 @@ class _ChatListsState extends State<ChatLists> {
           .snapshots()
           .listen((event) {
         setState(() {
-          messagePreviews[i] = event.data();
+          if (event.exists) {
+            messagePreviews[i] = event.data();
+          } else {
+            messagePreviews[i] = {
+              'text': 'New Chat created',
+              'time': DateTime.now().millisecondsSinceEpoch
+            };
+          }
         });
       });
     }
