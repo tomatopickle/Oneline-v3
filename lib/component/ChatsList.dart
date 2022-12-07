@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fancy_avatar/fancy_avatar.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:side_sheet/side_sheet.dart';
 import 'NewChat.dart';
 import 'package:ezanimation/ezanimation.dart';
@@ -304,12 +305,18 @@ Future getLastMessage(String chatId) {
 
 String getLocalTime(int item) {
   var dateObj = DateTime.fromMillisecondsSinceEpoch(item);
-  var time = (dateObj.hour < 13
-          ? dateObj.hour.toString()
-          : (dateObj.hour - 12).toString()) +
-      ':' +
-      ((dateObj.minute != 0) ? dateObj.minute.toString() : '00') +
-      ' ' +
-      (dateObj.hour < 13 ? 'AM' : 'PM');
+  var time = DateTime.now().difference(dateObj).inDays > 0
+      ? (dateObj.toLocal().day.toString() +
+          '/' +
+          dateObj.toLocal().month.toString() +
+          '/' +
+          dateObj.toLocal().year.toString())
+      : (dateObj.hour < 13
+              ? dateObj.hour.toString()
+              : (dateObj.hour - 12).toString()) +
+          ':' +
+          ((dateObj.minute != 0) ? dateObj.minute.toString() : '00') +
+          ' ' +
+          (dateObj.hour < 13 ? 'AM' : 'PM');
   return time;
 }

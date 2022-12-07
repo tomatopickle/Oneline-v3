@@ -206,31 +206,26 @@ class _ChatState extends State<Chat> {
         leadingWidth: mobile == true ? 100 : 50,
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(chatData['name']),
-          Padding(
-            padding: const EdgeInsets.only(left: 0),
-            child: StreamBuilder(
-              stream: rDb
-                  .ref('status/' + widget.data['otherUserData']['uid'])
-                  .onValue,
-              builder: (_, snapshot) {
-                if (snapshot.hasData && (snapshot.data != null)) {
-                  var e = snapshot.data?.snapshot.value as dynamic;
-                  print(snapshot.data?.snapshot.value?.toString() ?? '{}');
-                  return Text(
-                    e['status'] == 'offline'
-                        ? ('Last online ' +
-                            Jiffy(DateTime.fromMillisecondsSinceEpoch(
-                                    e['time']))
-                                .fromNow())
-                        : 'Online',
-                    style: Theme.of(context).textTheme.labelSmall,
-                  );
-                } else {
-                  return SizedBox();
-                }
-              },
-            ),
-          )
+          StreamBuilder(
+            stream: rDb
+                .ref('status/' + widget.data['otherUserData']['uid'])
+                .onValue,
+            builder: (_, snapshot) {
+              if (snapshot.hasData && (snapshot.data?.snapshot.value != null)) {
+                var e = snapshot.data?.snapshot.value as dynamic;
+                return Text(
+                  e['status'] == 'offline'
+                      ? ('Last online ' +
+                          Jiffy(DateTime.fromMillisecondsSinceEpoch(e['time']))
+                              .fromNow())
+                      : 'Online',
+                  style: Theme.of(context).textTheme.labelSmall,
+                );
+              } else {
+                return SizedBox();
+              }
+            },
+          ),
         ]),
         backgroundColor: Theme.of(context).backgroundColor,
       ),
