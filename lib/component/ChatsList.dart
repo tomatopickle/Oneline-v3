@@ -9,6 +9,9 @@ import 'NewChat.dart';
 import 'package:ezanimation/ezanimation.dart';
 import 'package:skeletons/skeletons.dart';
 import './SettingsDialog.dart';
+import 'package:firebase_database/firebase_database.dart';
+
+FirebaseDatabase rDb = FirebaseDatabase.instance;
 
 Widget UserInfo(context, User? user) {
   return Row(
@@ -185,22 +188,82 @@ class _ChatListsState extends State<ChatLists> {
                                           widget.openChat!(chat);
                                         },
                                         leading: SizedBox(
-                                          height: 50,
-                                          width: 50,
-                                          child: FancyAvatar(
-                                            radius: 130,
-                                            shadowColor: Colors.transparent,
-                                            ringWidth: 0,
-                                            ringColor: Colors.transparent,
-                                            userImage: Image.network(
-                                              userData['photoURL'] ??
-                                                  'https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png',
-                                              fit: BoxFit.cover,
-                                            ),
-                                            avatarBackgroundColor:
-                                                Colors.transparent,
-                                          ),
-                                        ),
+                                            height: 50,
+                                            width: 50,
+                                            child: Stack(children: [
+                                              FancyAvatar(
+                                                radius: 130,
+                                                shadowColor: Colors.transparent,
+                                                ringWidth: 0,
+                                                ringColor: Colors.transparent,
+                                                userImage: Image.network(
+                                                  userData['photoURL'] ??
+                                                      'https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png',
+                                                  fit: BoxFit.cover,
+                                                ),
+                                                avatarBackgroundColor:
+                                                    Colors.transparent,
+                                              ),
+                                              StreamBuilder(
+                                                  stream: rDb
+                                                      .ref('status/' +
+                                                          userData['uid'])
+                                                      .onValue,
+                                                  builder: (_, snapshot) {
+                                                    if (snapshot.hasData &&
+                                                        (snapshot.data?.snapshot
+                                                                .value !=
+                                                            null)) {
+                                                      var e = snapshot
+                                                          .data
+                                                          ?.snapshot
+                                                          .value as dynamic;
+                                                      return Positioned(
+                                                          right: 0,
+                                                          bottom: 0,
+                                                          child: AnimatedScale(
+                                                              scale:
+                                                                  e['status'] ==
+                                                                          'online'
+                                                                      ? 1
+                                                                      : 0,
+                                                              duration: Duration(
+                                                                  milliseconds:
+                                                                      100),
+                                                              child: Container(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .all(
+                                                                              1),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    border: Border.all(
+                                                                        color: Theme.of(context)
+                                                                            .cardColor,
+                                                                        width:
+                                                                            1.5,
+                                                                        strokeAlign:
+                                                                            StrokeAlign.outside),
+                                                                    color: Colors
+                                                                        .green,
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(6),
+                                                                  ),
+                                                                  constraints:
+                                                                      BoxConstraints(
+                                                                    minHeight:
+                                                                        13,
+                                                                    minWidth:
+                                                                        13,
+                                                                  ),
+                                                                  child:
+                                                                      SizedBox())));
+                                                    } else {
+                                                      return SizedBox();
+                                                    }
+                                                  }),
+                                            ])),
                                         title: Text(chatName),
                                         subtitle: Row(
                                           children: [
@@ -211,10 +274,14 @@ class _ChatListsState extends State<ChatLists> {
                                               message: messagePreviews[index]
                                                   ['text'],
                                               child: Text(
-                                                chatName +
-                                                    ': ' +
-                                                    messagePreviews[index]
-                                                        ['text'],
+                                                // (messagePreviews[index]
+                                                //                 ['sender'] !=
+                                                //             widget
+                                                //                 .userData['uid']
+                                                //         ? chatName
+                                                //         : 'You') +
+                                                //     ': ' +
+                                                messagePreviews[index]['text'],
                                                 maxLines: 1,
                                                 softWrap: false,
                                                 overflow: TextOverflow.ellipsis,

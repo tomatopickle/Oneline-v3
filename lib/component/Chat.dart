@@ -3,14 +3,10 @@ import 'package:ezanimation/ezanimation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/rendering.dart';
-import 'package:oneline/main.dart';
-import 'package:skeletons/skeletons.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'dart:convert';
 
 FirebaseDatabase rDb = FirebaseDatabase.instance;
 FirebaseFirestore db = FirebaseFirestore.instance;
@@ -441,7 +437,8 @@ List<Widget> renderMessages(context, members, messages, oldMsgsLoading) {
                           msgData['text'],
                           style: TextStyle(fontSize: 17.5),
                         )),
-                        if ((DateTime.fromMillisecondsSinceEpoch(
+                        if (previousMsg['time'] != null &&
+                            (DateTime.fromMillisecondsSinceEpoch(
                                         msgData['time'])
                                     .difference(
                                         DateTime.fromMillisecondsSinceEpoch(
