@@ -274,14 +274,15 @@ class _ChatListsState extends State<ChatLists> {
                                               message: messagePreviews[index]
                                                   ['text'],
                                               child: Text(
-                                                // (messagePreviews[index]
-                                                //                 ['sender'] !=
-                                                //             widget
-                                                //                 .userData['uid']
-                                                //         ? chatName
-                                                //         : 'You') +
-                                                //     ': ' +
-                                                messagePreviews[index]['text'],
+                                                (messagePreviews[index]
+                                                                ['sender'] !=
+                                                            widget
+                                                                .userData['uid']
+                                                        ? chatName
+                                                        : 'You') +
+                                                    ': ' +
+                                                    messagePreviews[index]
+                                                        ['text'],
                                                 maxLines: 1,
                                                 softWrap: false,
                                                 overflow: TextOverflow.ellipsis,
