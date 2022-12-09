@@ -269,6 +269,18 @@ class _NewPersonalChatState extends State<NewPersonalChat> {
                             'time': time,
                             'meta_type': 'server_info'
                           });
+                          db
+                              .collection("chats")
+                              .doc(id)
+                              .collection('msgs')
+                              .doc('lastMessage')
+                              .set({
+                            'type': 'meta',
+                            'text': 'New chat created',
+                            'time': time,
+                            'meta_type': 'server_info',
+                            'sender': widget.userData['uid']
+                          });
                           chatData['members'].forEach((uid) {
                             db
                                 .collection('users')
